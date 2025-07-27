@@ -141,9 +141,14 @@
                             <label class="block text-gray-700 mb-1">HTML Content</label>
                             <textarea id="htmlEditor" rows="8" class="w-full px-3 py-2 border rounded-md font-mono" placeholder="Enter your HTML content here..."></textarea>
                         </div>
-                        <button id="previewHtmlBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
-                            <i class="fas fa-eye mr-2"></i> Preview
-                        </button>
+                        <div class="flex space-x-2">
+                            <button id="loadTemplateBtn" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition">
+                                <i class="fas fa-magic mr-2"></i> Load Template
+                            </button>
+                            <button id="previewHtmlBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition">
+                                <i class="fas fa-eye mr-2"></i> Preview
+                            </button>
+                        </div>
                     </div>
 
                     <div id="flyerPreview" class="preview-container hidden mt-4">
@@ -227,9 +232,24 @@
                 <ol class="list-disc pl-5 mt-2 text-yellow-700">
                     <li>Sign up at <a href="https://www.emailjs.com/" target="_blank" class="text-blue-600 hover:underline">EmailJS.com</a></li>
                     <li>Create a service (like Gmail or SendGrid)</li>
-                    <li>Create an email template</li>
-                    <li>Replace the EmailJS credentials in the JavaScript code</li>
+                    <li>Create an email template with these variables: <code class="bg-gray-200 px-1 rounded">{{from_name}}</code>, <code class="bg-gray-200 px-1 rounded">{{to_email}}</code>, <code class="bg-gray-200 px-1 rounded">{{subject}}</code>, <code class="bg-gray-200 px-1 rounded">{{{flyer_content}}}</code></li>
+                    <li>Use triple braces <code class="bg-gray-200 px-1 rounded">{{{flyer_content}}}</code> for HTML content to render properly</li>
+                    <li>Set environment variables in Render deployment</li>
                 </ol>
+                
+                <div class="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
+                    <p class="text-blue-800 text-sm"><strong>📧 EmailJS Template Example:</strong></p>
+                    <pre class="text-xs text-blue-700 mt-1 bg-white p-2 rounded border overflow-x-auto">Subject: {{subject}}
+
+Dear Customer,
+
+{{{flyer_content}}}
+
+Best regards,
+{{from_name}}
+
+<a href="#">Unsubscribe</a></pre>
+                </div>
             </div>
         </div>
     </div>
@@ -256,6 +276,7 @@
         const htmlFlyerSection = document.getElementById('htmlFlyerSection');
         const htmlEditor = document.getElementById('htmlEditor');
         const previewHtmlBtn = document.getElementById('previewHtmlBtn');
+        const loadTemplateBtn = document.getElementById('loadTemplateBtn');
         const emailSubject = document.getElementById('emailSubject');
         
         const fromName = document.getElementById('fromName');
@@ -304,6 +325,7 @@
         imageFlyerBtn.addEventListener('click', () => switchFlyerType('image'));
         htmlFlyerBtn.addEventListener('click', () => switchFlyerType('html'));
         previewHtmlBtn.addEventListener('click', previewHtmlFlyer);
+        loadTemplateBtn.addEventListener('click', loadHtmlTemplate);
         
         sendEmailsBtn.addEventListener('click', sendEmails);
         
@@ -633,6 +655,47 @@
             
             showFlyerPreview();
             checkSendButtonStatus();
+        }
+        
+        function loadHtmlTemplate() {
+            const templateSubject = "🎉 Flash Sale - 50% OFF Everything!";
+            const templateHTML = `<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; text-align: center;">
+    <h1 style="margin: 0 0 20px 0; font-size: 28px; font-weight: bold;">🎉 FLASH SALE!</h1>
+    
+    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin: 20px 0;">
+        <h2 style="margin: 0 0 10px 0; font-size: 24px; color: #FFD700;">50% OFF Everything!</h2>
+        <p style="margin: 0; font-size: 16px;">Limited Time Offer - This Weekend Only</p>
+    </div>
+    
+    <div style="margin: 25px 0;">
+        <p style="font-size: 18px; margin: 10px 0;">✨ Premium Products</p>
+        <p style="font-size: 18px; margin: 10px 0;">🚚 Free Shipping</p>
+        <p style="font-size: 18px; margin: 10px 0;">💯 100% Satisfaction Guarantee</p>
+    </div>
+    
+    <a href="#" style="display: inline-block; background: #FF6B6B; color: white; padding: 15px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; font-size: 18px; margin: 20px 0;">
+        SHOP NOW
+    </a>
+    
+    <p style="font-size: 12px; margin: 20px 0 0 0; opacity: 0.8;">
+        Hurry! Sale ends Sunday at midnight
+    </p>
+</div>`;
+            
+            emailSubject.value = templateSubject;
+            htmlEditor.value = templateHTML;
+            
+            // Auto-preview the template
+            flyerData = {
+                type: 'html',
+                content: templateHTML,
+                subject: templateSubject
+            };
+            
+            showFlyerPreview();
+            checkSendButtonStatus();
+            
+            console.log('Template loaded successfully');
         }
         
         function checkSendButtonStatus() {
