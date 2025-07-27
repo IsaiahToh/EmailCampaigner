@@ -1,0 +1,27 @@
+{
+  "name": "email-campaign-manager",
+  "version": "1.0.0",
+  "description": "A web application for managing email campaigns with Excel file uploads and promotional flyers",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s . -l 3000",
+    "build": "echo 'No build process needed for static site'",
+    "dev": "serve -s . -l 3000"
+  },
+  "keywords": [
+    "email",
+    "campaign",
+    "marketing",
+    "bulk-email",
+    "excel",
+    "flyer"
+  ],
+  "author": "Isaiah Toh",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^14.2.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
