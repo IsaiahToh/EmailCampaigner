@@ -462,18 +462,7 @@ Best regards,
                 alert('Please select an image file.');
                 return;
             }
-            
-            // Check file size (warn if > 500KB as it may exceed EmailJS limits)
-            const maxSize = 500 * 1024; // 500KB
-            if (file.size > maxSize) {
-                const proceed = confirm(
-                    `Warning: This image is ${(file.size / 1024 / 1024).toFixed(1)}MB. ` +
-                    `Large images may exceed EmailJS's 50KB variable limit and fail to send.\n\n` +
-                    `Would you like to proceed? Consider using a smaller image or the HTML flyer option instead.`
-                );
-                if (!proceed) return;
-            }
-            
+                        
             const reader = new FileReader();
             reader.onload = function(e) {
                 const img = new Image();
