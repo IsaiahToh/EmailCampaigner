@@ -1,5 +1,6 @@
-# Environment configuration (contains sensitive data)
-env.js
+# Environment configuration 
+# Keep env.js for development, but it will be overwritten in production
+env.production.js
 
 # Dependencies
 node_modules/
