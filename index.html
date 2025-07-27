@@ -280,9 +280,9 @@
         // Variables
         let emailData = [];
         let flyerData = null;
-        let flyerType = 'image'; // 'image' or 'html'
+        let flyerType = 'image';
         
-        // Initialize EmailJS - Now properly initialized
+        // Initialize EmailJS
         console.log('EmailJS Config:', EMAILJS_CONFIG);
         if (EMAILJS_CONFIG.USER_ID !== 'YOUR_USER_ID' && EMAILJS_CONFIG.USER_ID !== 'demo_mode') {
             emailjs.init(EMAILJS_CONFIG.USER_ID);
@@ -441,17 +441,82 @@
                 return;
             }
             
+            // Check file size (warn if > 500KB as it may exceed EmailJS limits)
+            const maxSize = 500 * 1024; // 500KB
+            if (file.size > maxSize) {
+                const proceed = confirm(
+                    `Warning: This image is ${(file.size / 1024 / 1024).toFixed(1)}MB. ` +
+                    `Large images may exceed EmailJS's 50KB variable limit and fail to send.\n\n` +
+                    `Would you like to proceed? Consider using a smaller image or the HTML flyer option instead.`
+                );
+                if (!proceed) return;
+            }
+            
             const reader = new FileReader();
             reader.onload = function(e) {
-                flyerData = {
-                    type: 'image',
-                    content: e.target.result
+                const img = new Image();
+                img.onload = function() {
+                    // Compress image if it's too large
+                    compressAndStoreImage(img, e.target.result);
                 };
-                
-                showFlyerPreview();
-                checkSendButtonStatus();
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+        
+        function compressAndStoreImage(img, originalDataUrl) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate new dimensions (max 800px width while maintaining aspect ratio)
+            const maxWidth = 800;
+            const maxHeight = 600;
+            let { width, height } = img;
+            
+            if (width > maxWidth) {
+                height = (height * maxWidth) / width;
+                width = maxWidth;
+            }
+            
+            if (height > maxHeight) {
+                width = (width * maxHeight) / height;
+                height = maxHeight;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw and compress
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            // Try different quality levels to stay under size limit
+            let quality = 0.8;
+            let compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            
+            // Estimate base64 size (rough calculation)
+            const estimatedSize = compressedDataUrl.length * 0.75; // base64 is ~33% larger than binary
+            
+            // If still too large, reduce quality further
+            while (estimatedSize > 40000 && quality > 0.3) { // 40KB limit with some buffer
+                quality -= 0.1;
+                compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+            }
+            
+            flyerData = {
+                type: 'image',
+                content: compressedDataUrl,
+                originalSize: originalDataUrl.length,
+                compressedSize: compressedDataUrl.length,
+                compressionRatio: Math.round((1 - compressedDataUrl.length / originalDataUrl.length) * 100)
+            };
+            
+            showFlyerPreview();
+            checkSendButtonStatus();
+            
+            // Show compression info if significant compression occurred
+            if (flyerData.compressionRatio > 10) {
+                console.log(`Image compressed by ${flyerData.compressionRatio}% to fit EmailJS limits`);
+            }
         }
         
         function showEmailPreview() {
@@ -488,9 +553,16 @@
             flyerPreview.classList.remove('hidden');
             
             if (flyerData.type === 'image') {
+                const sizeKB = Math.round(flyerData.content.length / 1024);
+                const compressionInfo = flyerData.compressionRatio ? ` (compressed ${flyerData.compressionRatio}%)` : '';
+                const sizeWarning = flyerData.content.length > 40000 ? 
+                    '<p class="text-xs text-amber-600 mt-1">⚠️ Large image - may exceed EmailJS 50KB limit</p>' : 
+                    '<p class="text-xs text-green-600 mt-1">✓ Image size OK for EmailJS</p>';
+                
                 flyerContent.innerHTML = 
                     `<img src="${flyerData.content}" alt="Promotional Flyer" class="max-w-full h-auto rounded-md" />
-                    <p class="text-sm text-gray-500 mt-2 text-center">Image flyer preview</p>`;
+                    <p class="text-sm text-gray-500 mt-2 text-center">Image flyer preview (${sizeKB}KB${compressionInfo})</p>
+                    ${sizeWarning}`;
             } else if (flyerData.type === 'html') {
                 flyerContent.innerHTML = `
                     <div>
@@ -648,9 +720,37 @@
             
             console.log('Template params (before email-specific data):', templateParams);
             
-            // Add flyer content based on type
+            // Add flyer content based on type with size validation
             if (flyerData.type === 'image') {
-                templateParams.flyer_content = `<img src="${flyerData.content}" alt="Promotional Flyer" style="max-width: 100%;">`;
+                // Check image size before adding to template params
+                const imageSize = flyerData.content.length;
+                console.log('Image flyer size:', {
+                    imageDataLength: imageSize,
+                    imageSizeKB: Math.round(imageSize / 1024),
+                    compressionInfo: flyerData.compressionRatio ? `${flyerData.compressionRatio}% compressed` : 'no compression applied'
+                });
+                
+                // Estimate total payload size (rough calculation)
+                const baseParamsSize = JSON.stringify({...templateParams, to_email: 'test@example.com'}).length;
+                const estimatedTotalSize = baseParamsSize + imageSize;
+                
+                console.log('Payload size estimation:', {
+                    baseParamsSize,
+                    imageSize,
+                    estimatedTotalSize,
+                    estimatedTotalSizeKB: Math.round(estimatedTotalSize / 1024)
+                });
+                
+                // EmailJS has a 50KB limit, so we'll check for 45KB to be safe
+                if (estimatedTotalSize > 46000) {
+                    alert(`⚠️ Image too large for email!\n\nThe image flyer is approximately ${Math.round(estimatedTotalSize/1024)}KB, which exceeds EmailJS's 50KB limit.\n\nPlease try:\n• Using a smaller image\n• Using the HTML flyer option instead\n• Compressing the image further`);
+                    sendEmailsBtn.disabled = false;
+                    sendEmailsBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i> Send Emails';
+                    progressSection.classList.add('hidden');
+                    return;
+                }
+                
+                templateParams.flyer_content = `<img src="${flyerData.content}" alt="Promotional Flyer" style="max-width: 100%; height: auto;">`;
             } else {
                 templateParams.flyer_content = flyerData.content;
                 if (flyerData.subject) {
@@ -718,7 +818,23 @@
                 } catch (error) {
                     console.error(`❌ Error sending email to ${email}:`, error);
                     errorCount++;
-                    addEmailStatus(email, false, `Error: ${error.message}`);
+                    
+                    // Handle specific EmailJS errors
+                    let errorMessage = error.message || 'Unknown error';
+                    
+                    // Check for specific error types
+                    if (error.status === 413 || errorMessage.includes('Variables size limit') || errorMessage.includes('50Kb')) {
+                        errorMessage = 'Image too large (exceeds 50KB limit). Try a smaller image or HTML flyer.';
+                        console.log('📏 Size limit exceeded - suggesting alternatives');
+                    } else if (error.status === 400) {
+                        errorMessage = 'Bad request - check EmailJS configuration';
+                    } else if (error.status === 401) {
+                        errorMessage = 'Unauthorized - check EmailJS credentials';
+                    } else if (error.status === 429) {
+                        errorMessage = 'Rate limit exceeded - please wait and try again';
+                    }
+                    
+                    addEmailStatus(email, false, `Error: ${errorMessage}`);
                 }
                 
                 sentCount++;
