@@ -29,14 +29,26 @@ Currently, the app runs in demo mode. To send real emails:
 1. **Sign up for EmailJS**: Visit [emailjs.com](https://www.emailjs.com/) and create a free account
 2. **Create a Service**: Connect your email provider (Gmail, Outlook, SendGrid, etc.)
 3. **Create a Template**: Design your email template with placeholders
-4. **Update Configuration**: Replace the values in `EMAILJS_CONFIG`:
-   ```javascript
-   const EMAILJS_CONFIG = {
-       USER_ID: 'your_actual_user_id',
-       SERVICE_ID: 'your_service_id', 
-       TEMPLATE_ID: 'your_template_id'
-   };
-   ```
+4. **Set Environment Variables**: For security, credentials are stored as environment variables:
+
+### Local Development:
+```bash
+export EMAILJS_USER_ID="your_actual_user_id"
+export EMAILJS_SERVICE_ID="your_service_id"
+export EMAILJS_TEMPLATE_ID="your_template_id"
+npm run build
+npm start
+```
+
+### Render Deployment:
+1. In your Render dashboard, go to your app settings
+2. Add these environment variables:
+   - `EMAILJS_USER_ID`: Your EmailJS User ID
+   - `EMAILJS_SERVICE_ID`: Your service ID
+   - `EMAILJS_TEMPLATE_ID`: Your template ID
+3. Redeploy your app
+
+⚠️ **Security Note**: Never commit your actual EmailJS credentials to GitHub!
 
 ## File Formats Supported
 

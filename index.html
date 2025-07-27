@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3.2.0/dist/email.min.js"></script>
+    <script src="env.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .dropzone {
@@ -269,11 +270,11 @@
         const progressText = document.getElementById('progressText');
         const emailStatusList = document.getElementById('emailStatusList');
         
-        // Configuration - Replace these with your actual EmailJS credentials
+        // Configuration - Uses environment variables for security
         const EMAILJS_CONFIG = {
-            USER_ID: '1iVqF7YGKASsEAm7I',        // Get from EmailJS dashboard
-            SERVICE_ID: 'service_ozxoz8p',  // Gmail, Outlook, etc.
-            TEMPLATE_ID: 'template_qs7l9jz' // Your email template ID
+            USER_ID: window.ENV?.EMAILJS_USER_ID || 'YOUR_USER_ID',
+            SERVICE_ID: window.ENV?.EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID',
+            TEMPLATE_ID: window.ENV?.EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID'
         };
         
         // Variables

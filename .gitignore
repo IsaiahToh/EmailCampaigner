@@ -1,3 +1,6 @@
+# Environment configuration (contains sensitive data)
+env.js
+
 # Dependencies
 node_modules/
 npm-debug.log*

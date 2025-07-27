@@ -5,7 +5,7 @@
   "main": "index.html",
   "scripts": {
     "start": "serve -s . -l 3000",
-    "build": "echo 'No build process needed for static site'",
+    "build": "./build.sh",
     "dev": "serve -s . -l 3000"
   },
   "keywords": [
