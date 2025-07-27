@@ -710,28 +710,32 @@ Best regards,
             const inactiveClass = 'py-2 px-3 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50 text-sm';
             const activeClass = 'py-2 px-3 border rounded-md bg-indigo-600 text-white text-sm';
             
+            // Reset all buttons completely
             imageFlyerBtn.className = inactiveClass;
-            formFlyerBtn.className = inactiveClass;
-            htmlFlyerBtn.className = inactiveClass;
+            imageFlyerBtn.style.cssText = '';
+            imageFlyerBtn.onmouseenter = null;
+            imageFlyerBtn.onmouseleave = null;
             
+            formFlyerBtn.className = inactiveClass;
+            formFlyerBtn.style.cssText = '';
+            formFlyerBtn.onmouseenter = null;
+            formFlyerBtn.onmouseleave = null;
+            
+            htmlFlyerBtn.className = inactiveClass;
+            htmlFlyerBtn.style.cssText = '';
+            htmlFlyerBtn.onmouseenter = null;
+            htmlFlyerBtn.onmouseleave = null;
+            
+            // Set active button and show corresponding section
             if (type === 'image') {
                 imageFlyerSection.classList.remove('hidden');
                 imageFlyerBtn.className = activeClass;
-                imageFlyerBtn.style.cssText = 'background-color: #4f46e5 !important;';
-                imageFlyerBtn.onmouseenter = () => { imageFlyerBtn.style.backgroundColor = '#4338ca'; };
-                imageFlyerBtn.onmouseleave = () => { imageFlyerBtn.style.backgroundColor = '#4f46e5'; };
             } else if (type === 'form') {
                 formFlyerSection.classList.remove('hidden');
                 formFlyerBtn.className = activeClass;
-                formFlyerBtn.style.cssText = 'background-color: #4f46e5 !important;';
-                formFlyerBtn.onmouseenter = () => { formFlyerBtn.style.backgroundColor = '#4338ca'; };
-                formFlyerBtn.onmouseleave = () => { formFlyerBtn.style.backgroundColor = '#4f46e5'; };
             } else if (type === 'html') {
                 htmlFlyerSection.classList.remove('hidden');
                 htmlFlyerBtn.className = activeClass;
-                htmlFlyerBtn.style.cssText = 'background-color: #4f46e5 !important;';
-                htmlFlyerBtn.onmouseenter = () => { htmlFlyerBtn.style.backgroundColor = '#4338ca'; };
-                htmlFlyerBtn.onmouseleave = () => { htmlFlyerBtn.style.backgroundColor = '#4f46e5'; };
             }
         }
         
