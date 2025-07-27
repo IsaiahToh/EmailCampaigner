@@ -615,19 +615,31 @@ Best regards,
                 htmlFlyerSection.classList.add('hidden');
                 
                 // Update Image button to active state
-                imageFlyerBtn.className = 'flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white hover:bg-indigo-700';
+                imageFlyerBtn.className = 'flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white';
+                imageFlyerBtn.style.cssText = 'background-color: #4f46e5 !important;';
+                imageFlyerBtn.onmouseenter = () => { imageFlyerBtn.style.backgroundColor = '#4338ca'; };
+                imageFlyerBtn.onmouseleave = () => { imageFlyerBtn.style.backgroundColor = '#4f46e5'; };
                 
                 // Update HTML button to inactive state
                 htmlFlyerBtn.className = 'flex-1 py-2 px-4 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50';
+                htmlFlyerBtn.style.cssText = '';
+                htmlFlyerBtn.onmouseenter = null;
+                htmlFlyerBtn.onmouseleave = null;
             } else {
                 imageFlyerSection.classList.add('hidden');
                 htmlFlyerSection.classList.remove('hidden');
                 
                 // Update HTML button to active state
-                htmlFlyerBtn.className = 'flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white hover:bg-indigo-700';
+                htmlFlyerBtn.className = 'flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white';
+                htmlFlyerBtn.style.cssText = 'background-color: #4f46e5 !important;';
+                htmlFlyerBtn.onmouseenter = () => { htmlFlyerBtn.style.backgroundColor = '#4338ca'; };
+                htmlFlyerBtn.onmouseleave = () => { htmlFlyerBtn.style.backgroundColor = '#4f46e5'; };
                 
                 // Update Image button to inactive state
                 imageFlyerBtn.className = 'flex-1 py-2 px-4 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50';
+                imageFlyerBtn.style.cssText = '';
+                imageFlyerBtn.onmouseenter = null;
+                imageFlyerBtn.onmouseleave = null;
             }
         }
         
