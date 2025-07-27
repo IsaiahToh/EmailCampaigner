@@ -1,6 +1,7 @@
 # Environment configuration 
 # Keep env.js for development, but it will be overwritten in production
 env.production.js
+env.js
 
 # Dependencies
 node_modules/
