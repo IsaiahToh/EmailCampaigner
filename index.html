@@ -107,7 +107,7 @@
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Flyer Type</label>
                         <div class="flex space-x-4">
-                            <button id="imageFlyerBtn" class="flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white">
+                            <button id="imageFlyerBtn" class="flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
                                 <i class="fas fa-image mr-2"></i> Image Flyer
                             </button>
                             <button id="htmlFlyerBtn" class="flex-1 py-2 px-4 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50">
@@ -613,17 +613,21 @@ Best regards,
             if (type === 'image') {
                 imageFlyerSection.classList.remove('hidden');
                 htmlFlyerSection.classList.add('hidden');
-                imageFlyerBtn.classList.add('bg-indigo-600', 'text-white');
-                imageFlyerBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-                htmlFlyerBtn.classList.remove('bg-indigo-600', 'text-white');
-                htmlFlyerBtn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                
+                // Update Image button to active state
+                imageFlyerBtn.className = 'flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white hover:bg-indigo-700';
+                
+                // Update HTML button to inactive state
+                htmlFlyerBtn.className = 'flex-1 py-2 px-4 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50';
             } else {
                 imageFlyerSection.classList.add('hidden');
                 htmlFlyerSection.classList.remove('hidden');
-                htmlFlyerBtn.classList.add('bg-indigo-600', 'text-white');
-                htmlFlyerBtn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300');
-                imageFlyerBtn.classList.remove('bg-indigo-600', 'text-white');
-                imageFlyerBtn.classList.add('bg-white', 'text-gray-700', 'border-gray-300');
+                
+                // Update HTML button to active state
+                htmlFlyerBtn.className = 'flex-1 py-2 px-4 border rounded-md bg-indigo-600 text-white hover:bg-indigo-700';
+                
+                // Update Image button to inactive state
+                imageFlyerBtn.className = 'flex-1 py-2 px-4 border border-gray-300 rounded-md bg-white text-gray-700 hover:bg-gray-50';
             }
         }
         
