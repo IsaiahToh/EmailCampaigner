@@ -282,8 +282,14 @@
         let flyerData = null;
         let flyerType = 'image'; // 'image' or 'html'
         
-        // Initialize EmailJS (replace with your actual credentials)
-        // emailjs.init(EMAILJS_CONFIG.USER_ID); // Uncomment when you have real credentials
+        // Initialize EmailJS - Now properly initialized
+        console.log('EmailJS Config:', EMAILJS_CONFIG);
+        if (EMAILJS_CONFIG.USER_ID !== 'YOUR_USER_ID' && EMAILJS_CONFIG.USER_ID !== 'demo_mode') {
+            emailjs.init(EMAILJS_CONFIG.USER_ID);
+            console.log('EmailJS initialized with User ID:', EMAILJS_CONFIG.USER_ID);
+        } else {
+            console.log('EmailJS running in demo mode');
+        }
         
         // Event Listeners
         browseEmailBtn.addEventListener('click', () => emailFileInput.click());
@@ -609,14 +615,18 @@
                 return;
             }
             
+            console.log('Starting email send process...');
+            console.log('EmailJS Config:', EMAILJS_CONFIG);
+            
             // Check EmailJS configuration
             if (EMAILJS_CONFIG.USER_ID === 'YOUR_USER_ID' || 
                 EMAILJS_CONFIG.SERVICE_ID === 'YOUR_SERVICE_ID' || 
-                EMAILJS_CONFIG.TEMPLATE_ID === 'YOUR_TEMPLATE_ID') {
-                alert('⚠️ EmailJS not configured!\n\nThis is a demo. To actually send emails:\n1. Sign up at emailjs.com\n2. Create a service and template\n3. Replace the credentials in EMAILJS_CONFIG\n\nFor now, this will simulate sending emails.');
+                EMAILJS_CONFIG.TEMPLATE_ID === 'YOUR_TEMPLATE_ID' ||
+                EMAILJS_CONFIG.USER_ID === 'demo_mode') {
+                alert('⚠️ EmailJS not configured!\n\nThis is a demo. To actually send emails:\n1. Sign up at emailjs.com\n2. Create a service and template\n3. Set environment variables in Render\n\nFor now, this will simulate sending emails.');
+                // Continue with demo mode
             } else {
-                // Initialize EmailJS with real credentials
-                emailjs.init(EMAILJS_CONFIG.USER_ID);
+                console.log('EmailJS is properly configured. Proceeding with real email sending.');
             }
             
             // Update UI
@@ -635,6 +645,8 @@
                 reply_to: replyTo.value || 'contact@example.com',
                 unsubscribe_link: unsubscribeCheck.checked ? '<a href="#" style="color: #4f46e5;">Unsubscribe</a>' : '',
             };
+            
+            console.log('Template params (before email-specific data):', templateParams);
             
             // Add flyer content based on type
             if (flyerData.type === 'image') {
@@ -657,10 +669,15 @@
                     // Add recipient email to params
                     templateParams.to_email = email;
                     
+                    console.log(`Attempting to send email ${sentCount + 1}/${totalEmails} to:`, email);
+                    
                     // Check if EmailJS is properly configured
                     if (EMAILJS_CONFIG.USER_ID !== 'YOUR_USER_ID' && 
                         EMAILJS_CONFIG.SERVICE_ID !== 'YOUR_SERVICE_ID' && 
-                        EMAILJS_CONFIG.TEMPLATE_ID !== 'YOUR_TEMPLATE_ID') {
+                        EMAILJS_CONFIG.TEMPLATE_ID !== 'YOUR_TEMPLATE_ID' &&
+                        EMAILJS_CONFIG.USER_ID !== 'demo_mode') {
+                        
+                        console.log('Sending real email via EmailJS...');
                         
                         // Real EmailJS sending
                         const response = await emailjs.send(
@@ -669,14 +686,20 @@
                             templateParams
                         );
                         
+                        console.log('EmailJS response:', response);
+                        
                         if (response.status === 200) {
                             successCount++;
-                            addEmailStatus(email, true);
+                            addEmailStatus(email, true, 'Email sent successfully');
+                            console.log(`✅ Email sent successfully to ${email}`);
                         } else {
                             errorCount++;
-                            addEmailStatus(email, false, response.text);
+                            addEmailStatus(email, false, `Error: ${response.text || 'Unknown error'}`);
+                            console.log(`❌ Email failed to ${email}:`, response);
                         }
                     } else {
+                        console.log('Running in demo mode - simulating email send');
+                        
                         // Demo mode - simulate sending
                         const delay = addRateLimiting();
                         await new Promise(resolve => setTimeout(resolve, delay));
@@ -686,15 +709,16 @@
                         
                         if (isSuccess) {
                             successCount++;
-                            addEmailStatus(email, true);
+                            addEmailStatus(email, true, 'Demo: Simulated success');
                         } else {
                             errorCount++;
                             addEmailStatus(email, false, 'Demo: Simulated failure');
                         }
                     }
                 } catch (error) {
+                    console.error(`❌ Error sending email to ${email}:`, error);
                     errorCount++;
-                    addEmailStatus(email, false, error.message);
+                    addEmailStatus(email, false, `Error: ${error.message}`);
                 }
                 
                 sentCount++;
@@ -709,6 +733,8 @@
             
             // Update button when done
             sendEmailsBtn.innerHTML = `<i class="fas fa-check mr-2"></i> Done (${successCount} sent, ${errorCount} failed)`;
+            
+            console.log(`Campaign completed: ${successCount} sent, ${errorCount} failed`);
             
             // Show summary
             const summary = document.createElement('div');
